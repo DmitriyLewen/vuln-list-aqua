@@ -29,7 +29,7 @@ jobs:
 
       - name: Validate JSON
         run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep .json) && : // Ignore errors
+          CHANGED_FILES=$(git diff main --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep .json) && : // Ignore errors
           if [ -n "$CHANGED_FILES" ]; then
             echo "Validating JSON files: $CHANGED_FILES"
             ./osv-linter record lint $CHANGED_FILES
