@@ -3,7 +3,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   validate:
@@ -32,7 +31,12 @@ jobs:
           CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep .json) && : // Ignore errors
           if [ -n "$CHANGED_FILES" ]; then
             echo "Validating JSON files: $CHANGED_FILES"
-            ./osv-linter record lint $CHANGED_FILES
+            ## osv-linter doesn't return error code for invalid JSON. So we should handle this case.
+            output=$(./osv-linter record lint $CHANGED_FILES 2>&1 || true)
+            if [ -n "$output" ]; then
+              echo "$output"
+              exit 1
+            fi
           else
             echo "No JSON files changed. Skipping validation."
           fi
